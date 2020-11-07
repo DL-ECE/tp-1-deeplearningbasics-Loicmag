@@ -15,8 +15,8 @@ In this notebook you will train your first neural network. Feel free to look bac
 #### Install dependencies freeze by poetry
 """
 
-#!python3 -m pip install --upgrade pip
-#!python3 -m pip install matplotlib numpy scikit-learn==0.23.2
+!python3 -m pip install --upgrade pip
+!python3 -m pip install matplotlib numpy scikit-learn==0.23.2
 
 """#### Import the different module we will need in this notebook 
 
@@ -170,7 +170,7 @@ You have to do some implementations and replace the None assignment (variable = 
 Warning: None return type for some methods are not supposed to be affected
 """
 
-class Layer:#ne pas toucher cette cellule
+class Layer:
     def __init__(self):
         self.Z = None
         self.W = None
@@ -188,7 +188,7 @@ class FFNN:
         input_data = Layer()
         # TODO: initialize the Z matrix with the a matrix containing only zeros
         # its shape should be (minibatch_size, config[0])
-        input_data.Z = np.zeros(minibatch_size, config[0])
+        input_data.Z = np.zeros((minibatch_size, config[0]))
         self.layers.append(input_data)#initialisation de la layer d'entrée
                                         
         for i in range(1, len(config)):#on parcours toutes les layers sauf celle d'entrée
@@ -200,7 +200,7 @@ class FFNN:
             layer.W = np.random.randn(ncols_prev, nnodes)
             # TODO: initilize the matrix Z in the layer with a matrix containing only zeros
             # its shape should be (nlines_prev, nnodes)
-            layer.Z = np.zeros(nlines_prev, nnodes)
+            layer.Z = np.zeros((nlines_prev, nnodes))
             # TODO: use the sigmoid activation function
             layer.activation = sigmoid
             self.layers.append(layer)
@@ -221,12 +221,12 @@ class FFNN:
     def forward_pass(self, input_data: np.array)-> np.array:
         # TODO: perform the whole forward pass using the on_step_forward function
         self.layers[0].Z = input_data
-        for i in range(1,len(self.config)):
+        for i in range(1,len(self.layers)):
           signal = self.layers[i-1].Z
-          cur_layer = self.layer[i]
+          cur_layer = self.layers[i]
           _ = self.one_step_forward(signal,cur_layer)
 
-        return self.layer[-1].Z
+        return self.layers[-1].Z
     
     def one_step_backward(self, prev_layer: Layer, cur_layer: Layer)-> Layer:
         # TODO: Compute the D matrix of the current layer using the previous layer and return the current layer       
@@ -238,21 +238,30 @@ class FFNN:
         self.layers[-1].D = D_out.T
         # TODO: Compute the D matrix for all the layers (excluding the first one which corresponds to the input itself)
         # (you should only use self.layers[1:])
+        for i in range(len(self.layers)-2,0,-1):
+            prev_layer = self.layers[i+1]
+            cur_layer = self.layers[i]
+            _ = self.one_step_backward(prev_layer,cur_layer)
         pass
     
     def update_weights(self, cur_layer: Layer, next_layer: Layer)-> Layer:
         # TODO: Update the W matrix of the next_layer using the current_layer and the learning rate
         # and return the next_layer
-        pass
+        next_layer.W = -self.learning_rate*(np.dot(next_layer.D,cur_layer.Z)).T
+        return next_layer
     
     def update_all_weights(self)-> None:
         # TODO: Update all W matrix using the update_weights function
+        for i in range(0,len(self.layers)):
+          curl_layer = self.layers[i]
+          next_layer = self.layers[i+1]
+          _ = self.update_weights(curl_layer,next_layer)
         pass
         
     def get_error(self, y_pred: np.array, y_batch: np.array)-> float:
         # TODO: return the accuracy on the predictions
         # the accuracy should be in the [0.0, 1.0] range
-        pass
+        np.power(y_batch - y_pred,2)
     
     def get_test_error(self, X: np.array, y: np.array)-> float:
         # TODO: Compute the accuracy using the get_error function
