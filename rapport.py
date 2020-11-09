@@ -313,7 +313,7 @@ minibatch_size = 100
 nepoch = 50
 learning_rate = 0.01
 
-ffnn = FFNN(config=[784, 200, 100,50, 10], minibatch_size=minibatch_size, learning_rate=learning_rate)
+ffnn = FFNN(config=[784, 100, 100, 10], minibatch_size=minibatch_size, learning_rate=learning_rate)
 
 assert X_train.shape[0] % minibatch_size == 0
 assert X_test.shape[0] % minibatch_size == 0
@@ -368,4 +368,3 @@ Also explain how the neural network behave when changing them ?
 TODO
 """
 
-pass
