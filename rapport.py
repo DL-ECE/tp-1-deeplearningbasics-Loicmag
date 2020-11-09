@@ -255,13 +255,11 @@ class FFNN:
     def get_error(self, y_pred: np.array, y_batch: np.array)-> float:
         # TODO: return the accuracy on the predictions
         # the accuracy should be in the [0.0, 1.0] range
-        #n = y_pred.shape[1]
-        #cost = -1 / n * (np.dot(y_batch, np.log(y_pred).T) + np.dot(1 - y_batch, np.log(1 - y_pred).T))
-        nbr_true = 0
+        nbr_validate_test = 0
         for i in range(0,y_pred.shape[0]):
             if np.argmax(y_batch[i])==np.argmax(y_pred[i]):
-              nbr_true+=1
-        return nbr_true/y_pred.shape[0]
+              nbr_validate_test+=1
+        return nbr_validate_test/y_pred.shape[0]
     
     def get_test_error(self, X: np.array, y: np.array)-> float:
         # TODO: Compute the accuracy using the get_error function
@@ -312,10 +310,10 @@ To have all the point your neural network needs to have a Test accuracy > 92 % !
 """
 
 minibatch_size = 100 
-nepoch = 10
+nepoch = 50
 learning_rate = 0.01
 
-ffnn = FFNN(config=[784, 100, 100, 10], minibatch_size=minibatch_size, learning_rate=learning_rate)
+ffnn = FFNN(config=[784, 200, 100,50, 10], minibatch_size=minibatch_size, learning_rate=learning_rate)
 
 assert X_train.shape[0] % minibatch_size == 0
 assert X_test.shape[0] % minibatch_size == 0
@@ -329,27 +327,30 @@ Here we use a subset of the test data to try and find some miss classification.
 It will help us understand why the neural network failed sometimes to classify images.
 """
 
-nsample = 1000
-X_demo = X_test[:nsample,:]
-y_demo = ffnn.forward_pass(X_demo)
-y_true = y_test[:nsample,:]
+if __name__ == "__main__":
 
-index_to_plot = 50 
-plot_one_image(X_demo, y_true, index_to_plot)
+  nsample = 1000
+  X_demo = X_test[:nsample,:]
+  y_demo = ffnn.forward_pass(X_demo)
+  y_true = y_test[:nsample,:]
 
-# Compare to the prediction 
-prediction = np.argmax(y_demo[index_to_plot,:])
-true_target = np.argmax(y_true[index_to_plot,:])
+  index_to_plot = 50 
+  plot_one_image(X_demo, y_true, index_to_plot)
 
-# is it the same number ?
+  # Compare to the prediction 
+  prediction = np.argmax(y_demo[index_to_plot,:])
+  true_target = np.argmax(y_true[index_to_plot,:])
 
-# loop arround the demo test set and try to find a miss prediction
-for i in range(0, nsample):   
-    prediction = None # Todo
-    true_target = None # Todo
-    if prediction != true_target:
-        # TODO
-        pass
+  # is it the same number ? 
+  # loop arround the demo test set and try to find a miss prediction
+  for i in range(0, nsample):   
+      prediction = None # Todo
+      true_target = None # Todo
+      if prediction != true_target:
+          # TODO
+          pass
+
+
 
 """## Open analysis
 
