@@ -329,6 +329,9 @@ It will help us understand why the neural network failed sometimes to classify i
 
 if __name__ == "__main__":
 
+  X_text = normalize_data(X_test)
+  y_test = target_to_one_hot(y_test)
+
   nsample = 1000
   X_demo = X_test[:nsample,:]
   y_demo = ffnn.forward_pass(X_demo)
@@ -342,15 +345,14 @@ if __name__ == "__main__":
   true_target = np.argmax(y_true[index_to_plot,:])
 
   # is it the same number ? 
+  error = 0
   # loop arround the demo test set and try to find a miss prediction
   for i in range(0, nsample):   
-      prediction = None # Todo
-      true_target = None # Todo
+      prediction = np.argmax(y_demo[i]) # Todo
+      true_target = np.argmax(y_true[i]) # Todo
       if prediction != true_target:
-          # TODO
-          pass
-
-
+          error+=1
+  print(error/nsample)
 
 """## Open analysis
 
@@ -366,5 +368,19 @@ Also explain how the neural network behave when changing them ?
 ## Open analysis answer
 
 TODO
-"""
 
+Le mini-batch correspond à un sous ensemble parmis tout le jeu de données.
+Lors d'une itération du gradient, au lieu de passer toutes nos données en arguments, on passe le minibatch. Cela réduit donc le temps de calcul.
+
+nepoch correspond au nombre d'itérations de notre réseau de neuronnes permettant d'évaluer tout notre jeu de données. C'est à dire permettant à tous nos mini-batch d'entrer dans l'algorithme. Si nbatch = 10, alors l'algorithme va tourner 10 fois sur notre jeu de données permettant donc de s'entrainer 10 fois.
+Ainsi en augmentant ce nombre, on peut améliorer la précision de notre réseau de neuronnes. Cependant on augmente aussi le temps de calcul.
+
+config réprésente l'architecture de notre couche de neuronne. C'est à dire le nombre de couches ainsi que le nombre de neuronnes présents au sein de chaque couche.
+En modifiant le nombre de neuronnes présents dans les couches cachés, on influence sur la précision qu'aura notre algorithme pour la détection d'une image.
+Par exemple le premier neuronne peut permettre de distinguer les contours d'une image, le second les visages dans une image, le troisième les couleurs... Plus le nombre de neuronne est grand, plus on pourra donc detecter des paramètres spécifiques au sein d'une image et plus la détection sera meilleure.
+
+learning rate correspond au pas du gradient. Si le paramètre est trop petit alors la convergence du gradient vers un minimum de notre loss va mettre énormément de temps. Au contraire, s'il est trop élevé on fera de trop grand pas en descend vers le minimum et on risque de le louper et d'entrer dans une boucle infinie.
+
+Pour avoir une bonne précision, j'ai donc décidé d'augmenter le nombre de neuronnes au sein des couches cachées. Etant données que nos images ne comportent pas beaucoup de détails je ne pense pas qu'il soit indispensable d'ajouter une nouvelle couche de neuronnes (cela ne fera qu'augmenter le temps de calcul). Il n'est également pas indispensable d'ajouter énormément de neuronnes.
+J'ai également décidé d'augmenter la variable nepoch.
+"""
