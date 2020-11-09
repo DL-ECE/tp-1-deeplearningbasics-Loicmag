@@ -255,11 +255,10 @@ class FFNN:
     def get_error(self, y_pred: np.array, y_batch: np.array)-> float:
         # TODO: return the accuracy on the predictions
         # the accuracy should be in the [0.0, 1.0] range
-       # n = y_pred.shape[1]
+        #n = y_pred.shape[1]
         #cost = -1 / n * (np.dot(y_batch, np.log(y_pred).T) + np.dot(1 - y_batch, np.log(1 - y_pred).T))
         nbr_true = 0
         for i in range(0,y_pred.shape[0]):
-          #for j in range(0,y_pred.shape[1]):
             if np.argmax(y_batch[i])==np.argmax(y_pred[i]):
               nbr_true+=1
         return nbr_true/y_pred.shape[0]
@@ -367,3 +366,4 @@ Also explain how the neural network behave when changing them ?
 TODO
 """
 
+pass
