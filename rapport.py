@@ -12,13 +12,7 @@ Original file is located at
 
 In this notebook you will train your first neural network. Feel free to look back at the Lecture-1 slides to complete the cells below.
 
-#### Install dependencies freeze by poetry
-"""
-
-#!python3 -m pip install --upgrade pip
-#!python3 -m pip install matplotlib numpy scikit-learn==0.23.2
-
-"""#### Import the different module we will need in this notebook 
+#### Import the different module we will need in this notebook 
 
 All the dependencies are installed. Below we import them and will be using them in all our notebooks.
 
@@ -221,7 +215,7 @@ class FFNN:
     def forward_pass(self, input_data: np.array)-> np.array:
         # TODO: perform the whole forward pass using the on_step_forward function
         self.layers[0].Z = input_data
-        for i in range(1,len(self.layers)):
+        for i in range(1,self.nlayers):
           signal = self.layers[i-1].Z
           cur_layer = self.layers[i]
           _ = self.one_step_forward(signal,cur_layer)
@@ -238,7 +232,7 @@ class FFNN:
         self.layers[-1].D = D_out.T
         # TODO: Compute the D matrix for all the layers (excluding the first one which corresponds to the input itself)
         # (you should only use self.layers[1:])
-        for i in range(len(self.layers)-2,0,-1):
+        for i in range(self.nlayers-2,0,-1):
             prev_layer = self.layers[i+1]
             cur_layer = self.layers[i]
             _ = self.one_step_backward(prev_layer,cur_layer)
@@ -247,12 +241,12 @@ class FFNN:
     def update_weights(self, cur_layer: Layer, next_layer: Layer)-> Layer:
         # TODO: Update the W matrix of the next_layer using the current_layer and the learning rate
         # and return the next_layer
-        next_layer.W = -self.learning_rate*(np.dot(next_layer.D,cur_layer.Z)).T
+        next_layer.W = next_layer.W-self.learning_rate*(np.dot(next_layer.D,cur_layer.Z)).T
         return next_layer
     
     def update_all_weights(self)-> None:
         # TODO: Update all W matrix using the update_weights function
-        for i in range(0,len(self.layers)):
+        for i in range(0,self.nlayers-1):
           curl_layer = self.layers[i]
           next_layer = self.layers[i+1]
           _ = self.update_weights(curl_layer,next_layer)
@@ -261,7 +255,14 @@ class FFNN:
     def get_error(self, y_pred: np.array, y_batch: np.array)-> float:
         # TODO: return the accuracy on the predictions
         # the accuracy should be in the [0.0, 1.0] range
-        np.power(y_batch - y_pred,2)
+       # n = y_pred.shape[1]
+        #cost = -1 / n * (np.dot(y_batch, np.log(y_pred).T) + np.dot(1 - y_batch, np.log(1 - y_pred).T))
+        nbr_true = 0
+        for i in range(0,y_pred.shape[0]):
+          #for j in range(0,y_pred.shape[1]):
+            if np.argmax(y_batch[i])==np.argmax(y_pred[i]):
+              nbr_true+=1
+        return nbr_true/y_pred.shape[0]
     
     def get_test_error(self, X: np.array, y: np.array)-> float:
         # TODO: Compute the accuracy using the get_error function
@@ -271,7 +272,8 @@ class FFNN:
             X_batch = X[i,:,:].reshape(self.minibatch_size, -1)
             y_batch = y[i,:,:].reshape(self.minibatch_size, -1)           
             # TODO: get y_pred using the forward pass
-            error_sum += None
+            y_pred = self.forward_pass(X_batch)
+            error_sum += self.get_error(y_pred,y_batch)
         return error_sum / nbatch
             
         
@@ -310,16 +312,16 @@ It's on 12 points because there is a lot of functions to fill but also we want t
 To have all the point your neural network needs to have a Test accuracy > 92 % !!
 """
 
-minibatch_size = 5 
+minibatch_size = 100 
 nepoch = 10
 learning_rate = 0.01
 
-ffnn = FFNN(config=[784, 3, 3, 10], minibatch_size=minibatch_size, learning_rate=learning_rate)
+ffnn = FFNN(config=[784, 100, 100, 10], minibatch_size=minibatch_size, learning_rate=learning_rate)
 
 assert X_train.shape[0] % minibatch_size == 0
 assert X_test.shape[0] % minibatch_size == 0
 
-err = ffnn.train(nepoch, X_train, y_train, X_test, y_test)
+err = ffnn.train(nepoch, normalize_data(X_train), target_to_one_hot(y_train), normalize_data(X_test), target_to_one_hot(y_test))
 
 """## Error analysis (2 pts)
 
@@ -348,7 +350,6 @@ for i in range(0, nsample):
     true_target = None # Todo
     if prediction != true_target:
         # TODO
-        pass
 
 """## Open analysis
 
